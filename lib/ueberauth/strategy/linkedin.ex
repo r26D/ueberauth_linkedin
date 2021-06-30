@@ -107,9 +107,9 @@ defmodule Ueberauth.Strategy.LinkedIn do
     primary_contact = conn.private.linkedin_primary_contact
 
     %Info{
-      first_name: user["firstName"],
+      first_name: user["localizedFirstName"],
       image: info_image(user),
-      last_name: user["lastName"],
+      last_name: user["localizedLastName"],
       email: email_from_primary_contact(primary_contact)
     }
   end
@@ -174,7 +174,7 @@ defmodule Ueberauth.Strategy.LinkedIn do
   defp info_image(%{"profilePicture" => profilePicture} = _user) do
     profilePicture
     |> get_in(["displayImage~", "elements"])
-    |> List.last()
+    |> List.first()
     |> get_in(["identifiers"])
     |> List.last()
     |> get_in(["identifier"])
@@ -183,7 +183,10 @@ defmodule Ueberauth.Strategy.LinkedIn do
   defp info_image(_user), do: nil
 
   defp email_from_primary_contact(primary_contact) do
-    primary_contact |> get_in(["handle~", "emailAddress"])
+    primary_contact
+    |> get_in(["elements"])
+    |> List.first()
+    |> get_in(["handle~", "emailAddress"])
   end
 
   defp option(conn, key) do
