@@ -2,8 +2,8 @@ defmodule Ueberauth.Strategy.LinkedIn do
   @moduledoc """
   LinkedIn Strategy for Überauth.
   """
-  @user_url "https://api.linkedin.com/v2/me?projection=(id,localizedFirstName,localizedLastName,profilePicture(displayImage~:playableStreams))"
-  @primary_contact_url "https://api.linkedin.com/v2/clientAwareMemberHandles?q=members&projection=(elements*(primary,type,handle~))"
+  @user_url "https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))"
+  @primary_contact_url "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))"
 
   use Ueberauth.Strategy,
     uid_field: :id,
@@ -107,9 +107,9 @@ defmodule Ueberauth.Strategy.LinkedIn do
     primary_contact = conn.private.linkedin_primary_contact
 
     %Info{
-      first_name: user["localizedFirstName"],
+      first_name: user["firstName"],
       image: info_image(user),
-      last_name: user["localizedLastName"],
+      last_name: user["lastName"],
       email: email_from_primary_contact(primary_contact)
     }
   end
@@ -183,13 +183,7 @@ defmodule Ueberauth.Strategy.LinkedIn do
   defp info_image(_user), do: nil
 
   defp email_from_primary_contact(primary_contact) do
-    email_element =
-      primary_contact["elements"]
-      |> Enum.find(fn element ->
-        element["primary"] == true && element["type"] == "EMAIL"
-      end)
-
-    if email = email_element |> get_in(["handle~", "emailAddress"]), do: email, else: nil
+    primary_contact |> get_in(["handle~", "emailAddress"])
   end
 
   defp option(conn, key) do
