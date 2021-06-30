@@ -13,8 +13,8 @@ defmodule Ueberauth.Strategy.LinkedIn.OAuth do
   @defaults [
      strategy: __MODULE__,
      site: "https://api.linkedin.com",
-     authorize_url: "https://www.linkedin.com/oauth2/v2/authorization",
-     token_url: "https://www.linkedin.com/oauth2/v2/accessToken"
+     authorize_url: "https://www.linkedin.com/oauth/v2/authorization",
+     token_url: "https://www.linkedin.com/oauth/v2/accessToken"
    ]
 
   @doc """
